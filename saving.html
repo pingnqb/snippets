@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Kế hoạch tiết kiệm & đầu tư</title>
+	<style>
+		:root {
+			color-scheme: light;
+			--bg: #f3f6fb;
+			--card: #fff;
+			--text: #17243b;
+			--muted: #627189;
+			--line: #e2e8f0;
+			--primary: #2563eb;
+			--green: #059669;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--text);
+			font-family: system-ui, sans-serif;
+			line-height: 1.5;
+		}
+
+		main {
+			max-width: 1200px;
+			margin: 36px auto;
+			padding: 0 18px;
+		}
+
+		.topbar {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: 16px;
+		}
+
+		.topbar>div {
+			flex: 1;
+			min-width: 0;
+		}
+
+		.topbar .reset {
+			flex-shrink: 0;
+			margin-left: auto;
+			white-space: nowrap;
+		}
+
+		h1 {
+			margin-bottom: 6px;
+			font-size: clamp(24px, 4vw, 34px);
+		}
+
+		h2 {
+			font-size: 19px;
+			margin: 0 0 18px;
+		}
+
+		p {
+			color: var(--muted);
+		}
+
+		.card {
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 18px;
+			padding: 22px;
+			margin-top: 20px;
+			box-shadow: 0 6px 24px #17243b06;
+		}
+
+		.controls {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 22px;
+		}
+
+		label {
+			display: block;
+			font-weight: 600;
+			margin-bottom: 8px;
+		}
+
+		input[type=number] {
+			width: 100%;
+			padding: 10px;
+			border: 1px solid #cbd5e1;
+			border-radius: 9px;
+			font: inherit;
+			background: #fff;
+			color: var(--text);
+		}
+
+		input[type=range] {
+			width: 100%;
+			accent-color: var(--primary);
+		}
+
+		input:focus-visible,
+		button:focus-visible {
+			outline: 3px solid #93c5fd;
+			outline-offset: 2px;
+		}
+
+		small {
+			display: block;
+			color: var(--muted);
+			margin-top: 6px;
+		}
+
+		button {
+			border: 0;
+			border-radius: 9px;
+			padding: 10px 15px;
+			background: var(--primary);
+			color: #fff;
+			font: inherit;
+			cursor: pointer;
+		}
+
+		.secondary {
+			background: #eaf0fd;
+			color: #214b9c;
+		}
+
+		.danger {
+			background: #fff1f2;
+			color: #be123c;
+		}
+
+		button:disabled {
+			opacity: .4;
+			cursor: not-allowed;
+		}
+
+		.toolbar {
+			display: flex;
+			gap: 10px;
+			justify-content: space-between;
+			align-items: center;
+			flex-wrap: wrap;
+			margin-bottom: 14px;
+		}
+
+		.toolbar h2 {
+			margin: 0;
+		}
+
+		.table-wrap {
+			max-height: min(420px, 60vh);
+			overflow: auto;
+			scrollbar-gutter: stable;
+			margin-top: 12px;
+			border: 1px solid var(--line);
+			border-radius: 10px;
+		}
+
+		.table-wrap table {
+			border-collapse: separate;
+			border-spacing: 0;
+		}
+
+		.table-wrap thead th {
+			position: sticky;
+			top: 0;
+			z-index: 2;
+			background: var(--card);
+			box-shadow: 0 1px 0 var(--line);
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			white-space: nowrap;
+		}
+
+		th,
+		td {
+			padding: 12px 10px;
+			text-align: right;
+			border-bottom: 1px solid var(--line);
+		}
+
+		th {
+			color: var(--muted);
+			font-size: 13px;
+			font-weight: 600;
+		}
+
+		th:first-child,
+		td:first-child {
+			text-align: left;
+		}
+
+		td input[type=number] {
+			min-width: 100px;
+		}
+
+		output {
+			display: inline-block;
+			min-width: 110px;
+			font-variant-numeric: tabular-nums;
+		}
+
+		.stats {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 16px;
+		}
+
+		.stat {
+			padding: 20px;
+		}
+
+		.stat span {
+			color: var(--muted);
+		}
+
+		.stat strong {
+			display: block;
+			font-size: clamp(20px, 3vw, 28px);
+			margin-top: 8px;
+			overflow-wrap: anywhere;
+		}
+
+		#balance {
+			color: var(--primary);
+		}
+
+		#profit {
+			color: var(--green);
+		}
+
+		#chart {
+			display: block;
+			width: 100%;
+			height: auto;
+		}
+
+		.legend {
+			display: flex;
+			gap: 18px;
+			flex-wrap: wrap;
+			font-size: 14px;
+		}
+
+		.dot {
+			display: inline-block;
+			width: 10px;
+			height: 10px;
+			border-radius: 50%;
+			margin-right: 5px;
+		}
+
+		.range-scale {
+			display: flex;
+			justify-content: space-between;
+			color: var(--muted);
+			font-size: 12px;
+		}
+
+		.note {
+			font-size: 14px;
+		}
+
+		#error {
+			color: #be123c;
+		}
+
+		@media (max-width: 700px) {
+			main {
+				margin-top: 22px;
+			}
+
+			.controls,
+			.stats {
+				grid-template-columns: 1fr;
+			}
+
+			.card {
+				padding: 16px;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+		<header class="topbar">
+			<div>
+				<h1>Kế hoạch tiết kiệm & đầu tư</h1>
+				<p>Điều chỉnh từng năm để xem tiền góp, chi tiêu và lãi kép thay đổi như thế nào.</p>
+			</div>
+			<button id="reset" type="button" class="secondary reset">Đặt lại</button>
+		</header>
+
+		<section class="card controls" aria-label="Thiết lập chung">
+			<div>
+				<label for="initial">Vốn ban đầu (triệu đồng)</label>
+				<input id="initial" type="number" min="0" max="1000000000" step="0.1" value="0">
+			</div>
+
+			<div>
+				<label for="bonus">Thưởng mỗi năm (tháng lương)</label>
+				<input id="bonus" type="number" min="0" max="100" step="0.1" value="1">
+				<small>1 = 12 tháng lương + 1 tháng thưởng cuối năm.</small>
+			</div>
+
+			<div>
+				<label for="saving">
+					Tiết kiệm chung: <span id="savingLabel">50%</span>
+				</label>
+				<input id="saving" type="range" min="0" max="100" step="1" value="50">
+				<div class="range-scale"><span>0%</span><span>100%</span></div>
+				<small>Kéo để áp dụng cho mọi năm; vẫn có thể sửa riêng từng năm.</small>
+			</div>
+
+			<div>
+				<label for="annualReturn">
+					Sinh lời chung: <span id="returnLabel">10%</span>/năm
+				</label>
+				<input id="annualReturn" type="range" min="-50" max="50" step="0.1" value="10">
+				<div class="range-scale"><span>−50%</span><span>50%</span></div>
+				<small>Kéo để áp dụng cho mọi năm; vẫn có thể sửa riêng từng năm.</small>
+			</div>
+		</section>
+
+		<section class="card">
+			<div class="toolbar">
+				<h2>Thu nhập và giả định từng năm</h2>
+				<div>
+					<button id="add" type="button">+ Thêm năm</button>
+				</div>
+			</div>
+
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th>Năm</th>
+							<th>Thu nhập/tháng (triệu)</th>
+							<th>Tiết kiệm (%)</th>
+							<th>Chi tiêu/tháng (triệu)</th>
+							<th>Sinh lời/năm (%)</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody id="inputs"></tbody>
+				</table>
+			</div>
+
+			<small>
+				Chi tiêu = thu nhập/tháng × (1 − tỷ lệ tiết kiệm / 100).
+				Cột này tự tính, không chỉnh sửa trực tiếp và không bao gồm thưởng.
+			</small>
+			<p id="error" role="alert" hidden></p>
+		</section>
+
+		<div class="stats" aria-live="polite">
+			<div class="card stat">
+				<span>Tổng vốn đã bỏ vào</span>
+				<strong id="principal">—</strong>
+				<small>Bao gồm vốn ban đầu.</small>
+			</div>
+
+			<div class="card stat">
+				<span>Tổng lãi / lỗ</span>
+				<strong id="profit">—</strong>
+			</div>
+
+			<div class="card stat">
+				<span>Giá trị cuối kỳ</span>
+				<strong id="balance">—</strong>
+			</div>
+		</div>
+
+		<section class="card">
+			<h2>Tăng trưởng tài sản</h2>
+			<div class="legend">
+				<span><i class="dot" style="background:#2563eb"></i>Giá trị tài sản</span>
+				<span><i class="dot" style="background:#94a3b8"></i>Vốn đã bỏ vào</span>
+			</div>
+			<svg id="chart" viewBox="0 0 900 300" role="img"
+				aria-label="Biểu đồ vốn và giá trị tài sản cuối từng năm"></svg>
+		</section>
+
+		<section class="card">
+			<h2>Kết quả từng năm</h2>
+			<small>Đơn vị bảng: triệu đồng. Tiền lãi có thể âm khi lợi suất âm.</small>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th>Năm</th>
+							<th>Góp/tháng</th>
+							<th>Góp từ thưởng</th>
+							<th>Tổng góp năm</th>
+							<th>Lãi / lỗ năm</th>
+							<th>Vốn lũy kế</th>
+							<th>Số dư cuối năm</th>
+						</tr>
+					</thead>
+					<tbody id="results"></tbody>
+				</table>
+			</div>
+		</section>
+
+		<p class="note">
+			Mô hình giả định thu nhập không đổi trong từng năm, góp cuối mỗi tháng,
+			thưởng góp cuối năm và toàn bộ tiền tích lũy cùng hưởng lợi suất của năm đó.
+			Tỷ lệ tiết kiệm cũng áp dụng cho khoản thưởng.
+			Lợi suất tháng = (1 + lợi suất năm)^(1/12) − 1.
+			Chưa tính thuế, phí, lạm phát hoặc rút tiền.
+			Đây là mô phỏng, không phải cam kết lợi nhuận đầu tư.
+			Dữ liệu được lưu trên trình duyệt hiện tại nếu trình duyệt cho phép.
+		</p>
+	</main>
+
+	<script>
+		const $ = id => document.getElementById(id);
+		const KEY = "savings-planner-v1";
+
+		const defaults = () => ({
+			initial: 0,
+			bonus: 1,
+			saving: 50,
+			commonReturn: 10,
+			years: [24, 36, 43, 48, 58].map(income => ({
+				income,
+				saving: 50,
+				annualReturn: 10
+			}))
+		});
+
+		const within = (n, min, max) =>
+			Number.isFinite(n) && n >= min && n <= max;
+
+		function validState(s) {
+			return s &&
+				within(s.initial, 0, 1e9) &&
+				within(s.bonus, 0, 100) &&
+				within(s.saving, 0, 100) &&
+				within(s.commonReturn, -50, 50) &&
+				Array.isArray(s.years) &&
+				s.years.length >= 1 &&
+				s.years.length <= 50 &&
+				s.years.every(y => y &&
+					within(y.income, 0, 1e9) &&
+					within(y.saving, 0, 100) &&
+					within(y.annualReturn, -99.99, 1000));
+		}
+
+		let state = defaults();
+
+		try {
+			const saved = JSON.parse(localStorage.getItem(KEY));
+
+			// Tương thích dữ liệu từ phiên bản chưa có slider sinh lời chung.
+			if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+				if (saved.commonReturn === undefined) saved.commonReturn = 10;
+				if (validState(saved)) state = saved;
+			}
+		} catch {
+			// Vẫn hoạt động khi dữ liệu cũ hỏng hoặc localStorage bị chặn.
+		}
+
+		const format = n => Number(n).toFixed(2);
+
+		const percent = n => Number(n).toFixed(2) + "%";
+
+		const money = n => `${format(n)} triệu`;
+
+		function persist() {
+			try {
+				localStorage.setItem(KEY, JSON.stringify(state));
+			} catch {
+				// Không ảnh hưởng tính toán nếu không lưu được.
+			}
+		}
+
+		function renderInputs() {
+			$("initial").value = state.initial;
+			$("bonus").value = state.bonus;
+
+			$("saving").value = state.saving;
+			$("savingLabel").textContent = percent(state.saving);
+
+			$("annualReturn").value = state.commonReturn;
+			$("returnLabel").textContent = percent(state.commonReturn);
+
+			$("inputs").innerHTML = state.years.map((year, index) => `
+      <tr>
+        <td>Năm ${index + 1}</td>
+        <td>
+          <input type="number" min="0" max="1000000000" step="0.1"
+            data-index="${index}" data-field="income"
+            value="${year.income}"
+            aria-label="Thu nhập tháng năm ${index + 1}">
+        </td>
+        <td>
+          <input type="number" min="0" max="100" step="0.5"
+            data-index="${index}" data-field="saving"
+            value="${year.saving}"
+            aria-label="Tỷ lệ tiết kiệm năm ${index + 1}">
+        </td>
+        <td>
+          <output data-expense="${index}"
+            aria-label="Chi tiêu tháng năm ${index + 1}">
+            ${format(year.income * (1 - year.saving / 100))}
+          </output>
+        </td>
+        <td>
+          <input type="number" min="-99.99" max="1000" step="0.01"
+            data-index="${index}" data-field="annualReturn"
+            value="${year.annualReturn}"
+            aria-label="Lợi suất năm ${index + 1}">
+        </td>
+        <td>
+          <button type="button" class="danger" data-remove="${index}"
+            aria-label="Xóa năm ${index + 1}"
+            ${state.years.length === 1 ? "disabled" : ""}>
+            Xóa
+          </button>
+        </td>
+      </tr>
+    `).join("");
+
+			$("add").disabled = state.years.length >= 50;
+		}
+
+		function calculate() {
+			let balance = state.initial;
+			let principal = state.initial;
+			const rows = [];
+
+			state.years.forEach((year, index) => {
+				const opening = balance;
+				const monthly = year.income * year.saving / 100;
+				const bonus = monthly * state.bonus;
+				const contribution = monthly * 12 + bonus;
+
+				const monthlyRate = Math.expm1(
+					Math.log1p(year.annualReturn / 100) / 12
+				);
+
+				for (let month = 0; month < 12; month++) {
+					// Số dư cũ sinh lãi; khoản góp cuối tháng sinh lãi từ tháng sau.
+					balance = balance * (1 + monthlyRate) + monthly;
+				}
+
+				// Khoản tiết kiệm từ thưởng góp cuối năm.
+				balance += bonus;
+				principal += contribution;
+
+				rows.push({
+					year: index + 1,
+					monthly,
+					bonus,
+					contribution,
+					profit: balance - opening - contribution,
+					principal,
+					balance
+				});
+			});
+
+			return {
+				rows,
+				principal,
+				balance,
+				profit: balance - principal
+			};
+		}
+
+		function drawChart(rows) {
+			const points = [
+				{ year: 0, principal: state.initial, balance: state.initial },
+				...rows
+			];
+
+			const max = Math.max(
+				1,
+				...points.flatMap(point => [point.principal, point.balance])
+			);
+
+			const left = 78;
+			const right = 865;
+			const top = 25;
+			const bottom = 255;
+
+			const x = index =>
+				left + index / (points.length - 1) * (right - left);
+
+			const y = value =>
+				bottom - value / max * (bottom - top);
+
+			let svg = "";
+
+			for (let i = 0; i <= 4; i++) {
+				const value = max * i / 4;
+				const yy = y(value);
+				const label = value.toLocaleString("vi-VN", {
+					maximumFractionDigits: 0
+				});
+
+				svg += `
+        <line x1="${left}" y1="${yy}" x2="${right}" y2="${yy}"
+          stroke="#e2e8f0"/>
+        <text x="${left - 8}" y="${yy + 4}" text-anchor="end"
+          fill="#627189" font-size="12">${label}</text>
+      `;
+			}
+
+			const stride = Math.max(1, Math.ceil(rows.length / 10));
+
+			points.forEach((point, index) => {
+				if (index % stride === 0 || index === points.length - 1) {
+					svg += `
+          <text x="${x(index)}" y="280" text-anchor="middle"
+            fill="#627189" font-size="12">N${point.year}</text>
+        `;
+				}
+			});
+
+			for (const [field, color] of [
+				["principal", "#94a3b8"],
+				["balance", "#2563eb"]
+			]) {
+				const coords = points
+					.map((point, index) => `${x(index)},${y(point[field])}`)
+					.join(" ");
+
+				svg += `
+        <polyline points="${coords}" fill="none"
+          stroke="${color}" stroke-width="3"
+          stroke-linejoin="round"/>
+      `;
+			}
+
+			svg += `
+      <text x="${left}" y="15" fill="#627189" font-size="12">
+        Triệu đồng
+      </text>
+    `;
+
+			$("chart").innerHTML = svg;
+		}
+
+		function showError(message) {
+			$("error").textContent = message;
+			$("error").hidden = false;
+
+			$("inputs").querySelectorAll("[data-expense]").forEach(output => {
+				output.textContent = "—";
+			});
+
+			for (const id of ["principal", "profit", "balance"]) {
+				$(id).textContent = "—";
+			}
+
+			$("results").innerHTML = "";
+			$("chart").innerHTML = "";
+		}
+
+		function update() {
+			const fields = [
+				$("initial"),
+				$("bonus"),
+				...$("inputs").querySelectorAll("input")
+			];
+
+			if (fields.some(input =>
+				input.value.trim() === "" || !input.validity.valid
+			)) {
+				showError("Vui lòng nhập số hợp lệ trong giới hạn của từng ô.");
+				return;
+			}
+
+			state.initial = $("initial").valueAsNumber;
+			state.bonus = $("bonus").valueAsNumber;
+
+			$("inputs").querySelectorAll("input").forEach(input => {
+				const index = Number(input.dataset.index);
+				state.years[index][input.dataset.field] = input.valueAsNumber;
+			});
+
+			$("inputs").querySelectorAll("[data-expense]").forEach(output => {
+				const year = state.years[Number(output.dataset.expense)];
+				output.textContent = format(
+					year.income * (1 - year.saving / 100)
+				);
+			});
+
+			const result = calculate();
+
+			if (!Number.isFinite(result.balance) ||
+				!Number.isFinite(result.principal)) {
+				showError("Kết quả vượt giới hạn tính toán. Hãy giảm giá trị đầu vào.");
+				return;
+			}
+
+			$("error").hidden = true;
+			$("principal").textContent = money(result.principal);
+			$("profit").textContent = money(result.profit);
+			$("profit").style.color = result.profit < 0 ? "#be123c" : "#059669";
+			$("balance").textContent = money(result.balance);
+
+			$("results").innerHTML = result.rows.map(row => `
+      <tr>
+        <td>Năm ${row.year}</td>
+        <td>${format(row.monthly)}</td>
+        <td>${format(row.bonus)}</td>
+        <td>${format(row.contribution)}</td>
+        <td>${format(row.profit)}</td>
+        <td>${format(row.principal)}</td>
+        <td><strong>${format(row.balance)}</strong></td>
+      </tr>
+    `).join("");
+
+			drawChart(result.rows);
+			persist();
+		}
+
+		$("inputs").addEventListener("input", update);
+		$("initial").addEventListener("input", update);
+		$("bonus").addEventListener("input", update);
+
+		// Áp dụng tỷ lệ tiết kiệm chung cho tất cả các năm.
+		$("saving").addEventListener("input", () => {
+			state.saving = $("saving").valueAsNumber;
+			$("savingLabel").textContent = percent(state.saving);
+
+			$("inputs").querySelectorAll('[data-field="saving"]').forEach(input => {
+				input.value = state.saving;
+			});
+
+			update();
+		});
+
+		// Áp dụng lợi suất chung cho tất cả các năm.
+		$("annualReturn").addEventListener("input", () => {
+			state.commonReturn = $("annualReturn").valueAsNumber;
+			$("returnLabel").textContent = percent(state.commonReturn);
+
+			$("inputs")
+				.querySelectorAll('[data-field="annualReturn"]')
+				.forEach(input => {
+					input.value = state.commonReturn;
+				});
+
+			update();
+		});
+
+		$("add").addEventListener("click", () => {
+			if (!$("error").hidden || state.years.length >= 50) return;
+
+			// Năm mới kế thừa các thông số của năm cuối.
+			state.years.push({ ...state.years[state.years.length - 1] });
+			renderInputs();
+			update();
+		});
+
+		$("inputs").addEventListener("click", event => {
+			const button = event.target.closest("button[data-remove]");
+			if (!button || state.years.length <= 1) return;
+
+			state.years.splice(Number(button.dataset.remove), 1);
+			renderInputs();
+			update();
+		});
+
+		$("reset").addEventListener("click", () => {
+			if (!confirm("Đặt lại toàn bộ dữ liệu về mặc định?")) return;
+
+			state = defaults();
+			renderInputs();
+			update();
+		});
+
+		renderInputs();
+		update();
+	</script>
+</body>
+
+</html>
