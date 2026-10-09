@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Khi nào có thể mua nhà / đất?</title>
+
+	<style>
+		:root {
+			--bg: #f5f7fb;
+			--card: #fff;
+			--text: #162033;
+			--muted: #667085;
+			--line: #e5e7eb;
+			--primary: #2563eb;
+			--good: #059669;
+			--bad: #dc2626;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		[hidden] {
+			display: none !important;
+		}
+
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--text);
+			font-family: system-ui, sans-serif;
+			line-height: 1.5;
+		}
+
+		main {
+			max-width: 1100px;
+			margin: 24px auto;
+			padding: 0 16px 40px;
+		}
+
+		.topbar {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: 16px;
+		}
+
+		.topbar>div {
+			flex: 1;
+			min-width: 0;
+		}
+
+		h1 {
+			margin: 0 0 12px;
+			font-size: clamp(24px, 4vw, 32px);
+		}
+
+		h2 {
+			margin: 0 0 12px;
+			font-size: 19px;
+		}
+
+		p {
+			color: var(--muted);
+		}
+
+		.card,
+		.stat {
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 16px;
+			padding: 18px;
+		}
+
+		.card {
+			margin-top: 16px;
+		}
+
+		.grid,
+		.stats {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 14px;
+		}
+
+		.income-grid {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+
+		.stats {
+			margin-top: 16px;
+		}
+
+		label {
+			display: block;
+			font-weight: 600;
+			margin-bottom: 6px;
+		}
+
+		input[type="number"],
+		.computed {
+			width: 100%;
+			padding: 10px 12px;
+			border: 1px solid #d1d5db;
+			border-radius: 10px;
+			font: inherit;
+			color: var(--text);
+		}
+
+		input[type="number"] {
+			background: #fff;
+		}
+
+		.computed {
+			display: block;
+			background: #f9fafb;
+			min-height: 46px;
+		}
+
+		input:focus-visible,
+		button:focus-visible {
+			outline: 3px solid #93c5fd;
+			outline-offset: 2px;
+		}
+
+		.check {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			margin-bottom: 14px;
+		}
+
+		input[type="checkbox"] {
+			width: 18px;
+			height: 18px;
+			accent-color: var(--primary);
+		}
+
+		small,
+		.muted {
+			display: block;
+			color: var(--muted);
+			font-size: 13px;
+			margin-top: 6px;
+		}
+
+		.stat span {
+			display: block;
+			color: var(--muted);
+			font-size: 14px;
+		}
+
+		.stat strong {
+			display: block;
+			font-size: 24px;
+			margin-top: 8px;
+			overflow-wrap: anywhere;
+		}
+
+		.good {
+			color: var(--good);
+		}
+
+		.bad {
+			color: var(--bad);
+		}
+
+		.notice {
+			padding: 12px;
+			background: #eff6ff;
+			border-radius: 10px;
+			margin-top: 14px;
+		}
+
+		#surplusNote>div+div {
+			margin-top: 6px;
+		}
+
+		#error {
+			color: var(--bad);
+		}
+
+		button {
+			background: #e8eefc;
+			color: #1d4ed8;
+			padding: 10px 14px;
+			border: 0;
+			border-radius: 10px;
+			font: inherit;
+			cursor: pointer;
+		}
+
+		button.danger {
+			background: #fff1f2;
+			color: #be123c;
+		}
+
+		button:disabled {
+			opacity: .4;
+			cursor: not-allowed;
+		}
+
+		.reset {
+			flex-shrink: 0;
+			margin-left: auto;
+			white-space: nowrap;
+		}
+
+		.toolbar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin: 20px 0 10px;
+		}
+
+		.toolbar h2 {
+			margin: 0;
+		}
+
+		.table-wrap {
+			max-height: 360px;
+			overflow: auto;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			margin-top: 12px;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: separate;
+			border-spacing: 0;
+			white-space: nowrap;
+		}
+
+		th,
+		td {
+			padding: 10px 12px;
+			border-bottom: 1px solid var(--line);
+			text-align: right;
+		}
+
+		th:first-child,
+		td:first-child {
+			text-align: left;
+		}
+
+		thead th {
+			position: sticky;
+			top: 0;
+			background: #fff;
+			z-index: 1;
+		}
+
+		td input[type="number"] {
+			min-width: 110px;
+		}
+
+		@media (max-width: 700px) {
+
+			.grid,
+			.stats,
+			.income-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.topbar {
+				flex-wrap: wrap;
+			}
+
+			.topbar>div {
+				flex-basis: 100%;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+		<header class="topbar">
+			<div>
+				<h1>Khi nào có thể mua nhà / đất?</h1>
+				<p>Tính thời gian tích lũy, tiền cần vay và khoản trả nợ mỗi tháng.</p>
+			</div>
+			<button id="reset" class="reset" type="button">
+				Đặt lại mặc định
+			</button>
+		</header>
+
+		<noscript>
+			<p class="bad">Bạn cần bật JavaScript để sử dụng công cụ này.</p>
+		</noscript>
+
+		<section class="card">
+			<h2>1) Giá mua và tiền hiện có</h2>
+			<div class="grid">
+				<div>
+					<label for="price">Giá mua (triệu)</label>
+					<input id="price" type="number" min="0.1" max="1000000000" step="any" value="3000">
+				</div>
+				<div>
+					<label for="fees">Chi phí mua / sửa chữa thêm (triệu)</label>
+					<input id="fees" type="number" min="0" max="1000000000" step="any" value="300">
+				</div>
+				<div>
+					<label for="cash">Tiền hiện có (triệu)</label>
+					<input id="cash" type="number" min="0" max="1000000000" step="any" value="2000">
+				</div>
+				<div>
+					<label for="waitMonths">Muốn mua sau bao nhiêu tháng?</label>
+					<input id="waitMonths" type="number" min="0" max="1200" step="1" value="0">
+					<small>0 = mua ngay.</small>
+				</div>
+			</div>
+		</section>
+
+		<section class="card">
+			<h2>2) Thu nhập và chi tiêu</h2>
+			<div class="grid income-grid">
+				<div>
+					<label for="income">Thu nhập / tháng (triệu)</label>
+					<input id="income" type="number" min="0" max="1000000000" step="any" value="60">
+				</div>
+				<div>
+					<label for="expense">Chi tiêu / tháng (triệu)</label>
+					<input id="expense" type="number" min="0" max="1000000000" step="any" value="25">
+				</div>
+				<div>
+					<label for="expenseRate">Tỷ lệ chi tiêu (%)</label>
+					<output id="expenseRate" class="computed" for="income expense">—</output>
+					<small>Tự tính = chi tiêu / thu nhập × 100.</small>
+				</div>
+				<div>
+					<label for="reserveRate">Giữ lại dự phòng (% tiền dư)</label>
+					<input id="reserveRate" type="number" min="0" max="100" step="any" value="10">
+					<small>Không dùng khoản này để mua hoặc trả nợ.</small>
+				</div>
+			</div>
+
+			<div id="surplusNote" class="notice" aria-live="polite"></div>
+			<small>
+				Chi tiêu gồm sinh hoạt và các khoản nợ khác.
+				Thu nhập và chi tiêu được giả định không đổi.
+				Chỉ trích dự phòng khi tiền dư dương; nếu chi tiêu vượt thu nhập,
+				phần thiếu vẫn được tính vào dòng tiền.
+			</small>
+		</section>
+
+		<section class="card">
+			<h2>3) Khoản vay</h2>
+			<div class="grid">
+				<div>
+					<label for="downRate">Trả trước tối thiểu (% giá mua)</label>
+					<input id="downRate" type="number" min="0" max="100" step="any" value="30">
+					<small>Chi phí mua thêm phải thanh toán bằng tiền có sẵn.</small>
+				</div>
+				<div>
+					<label for="termYears">Thời hạn vay (năm)</label>
+					<input id="termYears" type="number" min="1" max="50" step="1" value="5">
+				</div>
+			</div>
+
+			<div class="toolbar">
+				<h2>Lãi suất theo từng năm sau khi mua</h2>
+				<button id="addRate" type="button">+ Thêm năm</button>
+			</div>
+
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th>Năm vay</th>
+							<th>Lãi suất (%/năm)</th>
+							<th>Thao tác</th>
+						</tr>
+					</thead>
+					<tbody id="rates"></tbody>
+				</table>
+			</div>
+
+			<small>
+				Các năm chưa có dòng riêng dùng lãi suất của dòng cuối.
+				Khoản trả hằng tháng được tính lại đầu mỗi năm theo dư nợ,
+				thời hạn còn lại và lãi suất năm đó.
+			</small>
+		</section>
+
+		<section class="card">
+			<h2>4) Thu nhập cho thuê sau mua</h2>
+			<label class="check">
+				<input id="useRent" type="checkbox">
+				Bất động sản có thể cho thuê
+			</label>
+
+			<div class="grid" id="rentFields" hidden>
+				<div>
+					<label for="rent">Tiền thuê / tháng (triệu)</label>
+					<input id="rent" type="number" min="0" max="1000000000" step="any" value="8" disabled>
+				</div>
+				<div>
+					<label for="rentCost">Chi phí cho thuê / tháng (triệu)</label>
+					<input id="rentCost" type="number" min="0" max="1000000000" step="any" value="1" disabled>
+				</div>
+				<div>
+					<label for="vacancy">Tỷ lệ trống phòng (%)</label>
+					<input id="vacancy" type="number" min="0" max="100" step="any" value="10" disabled>
+				</div>
+			</div>
+
+			<small>
+				Thuê ròng = tiền thuê × (1 − tỷ lệ trống / 100) − chi phí.
+				Nếu thuê ròng âm, khoản lỗ làm giảm ngân sách trả nợ.
+			</small>
+		</section>
+
+		<p id="error" role="alert" hidden></p>
+
+		<div id="output">
+			<div class="stats" aria-live="polite">
+				<div class="stat">
+					<span>Đủ tiền mua không vay sau</span>
+					<strong id="cashReady">—</strong>
+				</div>
+				<div class="stat">
+					<span>Sớm nhất có thể mua theo giả định vay</span>
+					<strong id="loanReady">—</strong>
+				</div>
+			</div>
+
+			<section class="card">
+				<h2>Kế hoạch tại thời điểm bạn chọn</h2>
+				<p id="purchaseStatus" class="notice"></p>
+
+				<div class="stats">
+					<div class="stat">
+						<span>Tiền tích lũy dùng mua</span>
+						<strong id="cashAtBuy">—</strong>
+					</div>
+					<div class="stat">
+						<span>Số tiền cần vay</span>
+						<strong id="loanAmount">—</strong>
+					</div>
+					<div class="stat">
+						<span>Trả nợ / tháng — năm đầu</span>
+						<strong id="firstPay">—</strong>
+					</div>
+					<div class="stat">
+						<span>Trả nợ / tháng — cao nhất</span>
+						<strong id="maxPay">—</strong>
+					</div>
+					<div class="stat">
+						<span>Ngân sách trả nợ / tháng</span>
+						<strong id="budget">—</strong>
+						<small>Tiền dư sau dự phòng + tiền thuê ròng.</small>
+					</div>
+					<div class="stat">
+						<span>Bạn tự bỏ ra tháng đầu</span>
+						<strong id="ownPay">—</strong>
+						<small>Bao gồm khoản lỗ cho thuê nếu có.</small>
+					</div>
+					<div class="stat">
+						<span>Trả hết nợ sau khi mua</span>
+						<strong id="payoff">—</strong>
+					</div>
+					<div class="stat">
+						<span>Tổng tiền trả lãi</span>
+						<strong id="totalInterest">—</strong>
+					</div>
+				</div>
+
+				<p id="rentNote" class="muted"></p>
+				<p id="interestNote" class="muted"></p>
+			</section>
+
+			<section class="card">
+				<h2>Lịch trả nợ theo năm sau mua</h2>
+				<small>
+					Đơn vị: triệu đồng. Lịch giả định thanh toán đầy đủ,
+					kể cả khi kế hoạch mua chưa khả thi.
+					Số tiền hiển thị được làm tròn đến hai chữ số thập phân.
+				</small>
+
+				<div class="table-wrap">
+					<table>
+						<thead>
+							<tr>
+								<th>Năm</th>
+								<th>Lãi suất (%)</th>
+								<th>Dư nợ đầu năm</th>
+								<th>Trả/tháng</th>
+								<th>Thuê bù/tháng</th>
+								<th>Bạn tự bỏ ra/tháng</th>
+								<th>Tổng trả năm</th>
+								<th>Tiền trả lãi</th>
+								<th>Dư nợ cuối năm</th>
+							</tr>
+						</thead>
+						<tbody id="rows"></tbody>
+					</table>
+				</div>
+			</section>
+		</div>
+
+		<p class="muted">
+			Mô hình giữ nguyên giá mua, thu nhập, chi tiêu và tiền thuê.
+			Tích lũy trước mua không tính sinh lời.
+			Dự phòng hằng tháng được giữ riêng, không cộng vào tiền dùng mua.
+			Tiền hiện có được dùng tối đa để mua, không giữ lại dự phòng ban đầu.
+			Tỷ lệ trống phòng được quy đổi thành doanh thu bình quân.
+			Lãi tháng = lãi năm / 12.
+			Chưa tính phí vay, phí trả trước hạn hoặc quy định riêng của ngân hàng.
+			Đây không phải xác nhận ngân hàng sẽ duyệt vay.
+		</p>
+	</main>
+
+	<script>
+		"use strict";
+
+		const $ = id => document.getElementById(id);
+		const EPS = 1e-6;
+
+		const fmt = value => {
+			const normalized = Math.abs(value) < EPS ? 0 : value;
+			return normalized.toFixed(2);
+		};
+
+		const money = value => `${fmt(value)} triệu`;
+
+		// Chỉnh mặc định ở đây. Các giá trị được áp dụng khi mở trang và đặt lại.
+		const DEFAULTS = {
+			price: 3000,
+			fees: 300,
+			cash: 2000,
+			waitMonths: 0,
+			income: 60,
+			expense: 25,
+			reserveRate: 10,
+			downRate: 30,
+			termYears: 5,
+			rent: 8,
+			rentCost: 1,
+			vacancy: 10
+		};
+
+		const DEFAULT_USE_RENT = false;
+		const DEFAULT_RATES = [8, 8, 12];
+
+		function duration(months) {
+			if (months === 0) return "Ngay";
+
+			const years = Math.floor(months / 12);
+			const rest = months % 12;
+
+			return [
+				years ? `${years} năm` : "",
+				rest ? `${rest} tháng` : ""
+			].filter(Boolean).join(" ");
+		}
+
+		function renderRates(values) {
+			$("rates").innerHTML = values.map((value, index) => {
+				const rate = Number.isFinite(value) ? value : "";
+
+				return `
+        <tr>
+          <td>Năm ${index + 1}${index === values.length - 1 ? " trở đi" : ""}</td>
+          <td>
+            <input type="number" min="0" max="100" step="any"
+              data-rate="${index}" value="${rate}"
+              aria-label="Lãi suất năm vay ${index + 1}">
+          </td>
+          <td>
+            <button type="button" class="danger" data-remove="${index}"
+              aria-label="Xóa lãi suất năm ${index + 1}"
+              ${values.length === 1 ? "disabled" : ""}>
+              Xóa
+            </button>
+          </td>
+        </tr>
+      `;
+			}).join("");
+		}
+
+		function currentRates() {
+			return Array.from(document.querySelectorAll("[data-rate]"))
+				.map(input => input.valueAsNumber);
+		}
+
+		function paymentFor(loan, monthlyRate, months) {
+			if (loan <= 0) return 0;
+			if (monthlyRate === 0) return loan / months;
+
+			return loan * monthlyRate /
+				(-Math.expm1(-months * Math.log1p(monthlyRate)));
+		}
+
+		function schedule(loan, rates, termMonths, netRent) {
+			const rows = [];
+
+			if (loan <= EPS) {
+				return {
+					rows,
+					paidOff: true,
+					months: 0,
+					interest: 0,
+					paid: 0,
+					firstPay: 0,
+					maxPay: 0
+				};
+			}
+
+			let debt = loan;
+			let month = 0;
+			let interestTotal = 0;
+			let paidTotal = 0;
+			let firstPay = 0;
+			let maxPay = 0;
+			let monthlyPayment = 0;
+			let monthlyRate = 0;
+			let row;
+
+			while (debt > EPS && month < termMonths) {
+				if (month % 12 === 0) {
+					const yearIndex = Math.floor(month / 12);
+					const annualRate = rates[Math.min(yearIndex, rates.length - 1)];
+
+					monthlyRate = annualRate / 100 / 12;
+					monthlyPayment = paymentFor(debt, monthlyRate, termMonths - month);
+
+					row = {
+						year: yearIndex + 1,
+						rate: annualRate,
+						opening: debt,
+						monthly: monthlyPayment,
+						rentOffset: Math.min(netRent, monthlyPayment),
+						own: Math.max(0, monthlyPayment - netRent),
+						total: 0,
+						interest: 0,
+						closing: debt
+					};
+
+					rows.push(row);
+					maxPay = Math.max(maxPay, monthlyPayment);
+				}
+
+				const interest = debt * monthlyRate;
+				const pay = Math.min(monthlyPayment, debt + interest);
+
+				if (month === 0) firstPay = pay;
+
+				debt = Math.max(0, debt + interest - pay);
+				interestTotal += interest;
+				paidTotal += pay;
+				row.total += pay;
+				row.interest += interest;
+				row.closing = debt;
+				month++;
+			}
+
+			return {
+				rows,
+				paidOff: debt <= EPS,
+				months: month,
+				interest: interestTotal,
+				paid: paidTotal,
+				firstPay,
+				maxPay
+			};
+		}
+
+		function syncRentFields() {
+			const enabled = $("useRent").checked;
+			$("rentFields").hidden = !enabled;
+
+			for (const id of ["rent", "rentCost", "vacancy"]) {
+				$(id).disabled = !enabled;
+			}
+		}
+
+		function showInputError(message) {
+			$("error").textContent = message;
+			$("error").hidden = false;
+			$("output").hidden = true;
+			$("surplusNote").textContent = "—";
+			$("expenseRate").textContent = "—";
+		}
+
+		function render() {
+			syncRentFields();
+
+			const inputs = Array.from(document.querySelectorAll('input[type="number"]'))
+				.filter(input => !input.disabled);
+
+			const invalidInput = inputs.find(input =>
+				input.value.trim() === "" ||
+				!input.validity.valid ||
+				!Number.isFinite(input.valueAsNumber)
+			);
+
+			if (invalidInput) {
+				const label = invalidInput.labels && invalidInput.labels[0];
+				const name = label
+					? label.textContent.trim()
+					: invalidInput.getAttribute("aria-label") || "Ô nhập";
+
+				showInputError(`Vui lòng nhập số hợp lệ cho: ${name}.`);
+				return;
+			}
+
+			const v = {};
+			for (const id of Object.keys(DEFAULTS)) {
+				v[id] = $(id).valueAsNumber;
+			}
+
+			const rates = currentRates();
+			const useRent = $("useRent").checked;
+			const totalCost = v.price + v.fees;
+
+			// Giữ phần thiếu hụt nếu chi tiêu vượt thu nhập.
+			const grossSurplus = v.income - v.expense;
+			const reserve = Math.max(0, grossSurplus) * v.reserveRate / 100;
+			const saving = grossSurplus - reserve;
+
+			const netRent = useRent
+				? v.rent * (1 - v.vacancy / 100) - v.rentCost
+				: 0;
+
+			const budget = saving + netRent;
+			const termMonths = v.termYears * 12;
+			const minCash = v.fees + v.price * v.downRate / 100;
+
+			$("error").hidden = true;
+			$("error").textContent = "";
+			$("output").hidden = false;
+
+			$("surplusNote").innerHTML = `
+      <div>Tiền dư trước dự phòng: <b>${money(grossSurplus)}</b> / tháng</div>
+      <div>Giữ lại dự phòng: <b>${money(reserve)}</b> / tháng</div>
+      <div>Còn lại để trả nợ / mua: <b>${money(saving)}</b> / tháng</div>
+    `;
+
+			$("expenseRate").textContent = v.income > 0
+				? fmt(v.expense / v.income * 100)
+				: "Không xác định";
+
+			const cashReady = v.cash + EPS >= totalCost
+				? 0
+				: saving > 0
+					? Math.ceil((totalCost - v.cash) / saving)
+					: null;
+
+			$("cashReady").textContent = cashReady === null
+				? "Không đủ với dòng tiền hiện tại"
+				: duration(cashReady);
+
+			// Khoản trả tỷ lệ thuận với tiền vay khi lãi suất và thời hạn giữ nguyên.
+			// Tính một lịch tham chiếu để tránh dựng lại lịch vay cho mỗi tháng chờ.
+			const referenceLoan = 1000;
+			const referencePlan = schedule(referenceLoan, rates, termMonths, 0);
+			const maxPayPerUnit = referencePlan.maxPay / referenceLoan;
+
+			let earliest = null;
+
+			for (let month = 0; month <= 1200; month++) {
+				const cashNow = v.cash + saving * month;
+				const loanNow = Math.max(0, totalCost - cashNow);
+
+				if (loanNow <= EPS) {
+					earliest = month;
+					break;
+				}
+
+				if (cashNow + EPS < minCash) continue;
+
+				if (
+					referencePlan.paidOff &&
+					budget + EPS >= loanNow * maxPayPerUnit
+				) {
+					earliest = month;
+					break;
+				}
+			}
+
+			$("loanReady").textContent = earliest === null
+				? "Chưa khả thi trong 100 năm mô phỏng"
+				: duration(earliest);
+
+			const available = v.cash + saving * v.waitMonths;
+
+			// Nếu dòng tiền âm đã làm hết tiền, phần âm là thiếu hụt,
+			// không tự động cộng thiếu hụt sinh hoạt vào khoản vay mua nhà.
+			const purchaseCash = Math.max(0, available);
+			const loan = Math.max(0, totalCost - purchaseCash);
+			const plan = schedule(loan, rates, termMonths, netRent);
+
+			const hasLoan = loan > EPS;
+			const enoughDown = available + EPS >= minCash;
+			const enoughMonthly = budget + EPS >= plan.maxPay;
+			const problems = [];
+
+			if (available < -EPS) {
+				problems.push(`tiền hiện có đã hết, thiếu hụt ${money(-available)} trước mua`);
+			}
+
+			if (hasLoan && !enoughDown) {
+				problems.push(
+					`thiếu ${money(minCash - purchaseCash)} để đạt mức trả trước tối thiểu`
+				);
+			}
+
+			if (hasLoan && !enoughMonthly) {
+				problems.push(
+					`khoản trả cao nhất vượt ngân sách ${money(plan.maxPay - budget)} / tháng`
+				);
+			}
+
+			if (hasLoan && !plan.paidOff) {
+				problems.push("chưa trả hết nợ trong thời hạn mô phỏng");
+			}
+
+			const timing = v.waitMonths === 0
+				? "Mua ngay"
+				: `Mua sau ${duration(v.waitMonths)}`;
+
+			const status = $("purchaseStatus");
+
+			if (problems.length > 0) {
+				status.textContent = `${timing}: chưa khả thi — ${problems.join("; ")}.`;
+				status.className = "notice bad";
+			} else if (!hasLoan) {
+				status.textContent =
+					`${timing}: không cần vay. Sau khi thanh toán còn ${money(available - totalCost)}.`;
+				status.className = "notice good";
+			} else {
+				status.textContent =
+					`${timing}: có thể mua theo các giả định đã nhập, cần vay ${money(loan)}.`;
+				status.className = "notice good";
+			}
+
+			$("cashAtBuy").textContent = money(available);
+			$("loanAmount").textContent = money(loan);
+			$("firstPay").textContent = money(plan.firstPay);
+			$("maxPay").textContent = money(plan.maxPay);
+			$("budget").textContent = money(budget);
+
+			$("maxPay").className = hasLoan && !enoughMonthly ? "bad" : "";
+			$("budget").className = budget < 0 || (hasLoan && !enoughMonthly)
+				? "bad"
+				: "good";
+
+			const ownFirst = hasLoan ? Math.max(0, plan.firstPay - netRent) : 0;
+			$("ownPay").textContent = money(ownFirst);
+			$("ownPay").className = hasLoan && ownFirst > saving + EPS ? "bad" : "";
+
+			$("payoff").textContent = !hasLoan
+				? "Không cần vay"
+				: plan.paidOff
+					? `${duration(plan.months)} (theo lịch)`
+					: "Chưa hết nợ trong thời hạn đã nhập";
+
+			$("totalInterest").textContent = money(plan.interest);
+
+			$("rentNote").textContent =
+				`Tiền dư sau dự phòng: ${money(saving)} / tháng. ` +
+				`Tiền thuê ròng sau mua: ${money(netRent)} / tháng.`;
+
+			$("interestNote").textContent = !hasLoan
+				? "Không phát sinh lãi vay."
+				: `Tổng trả cho khoản vay theo lịch: ${money(plan.paid)}. ` +
+				(plan.paidOff
+					? `Từ hôm nay đến hết nợ theo lịch: ${duration(v.waitMonths + plan.months)}.`
+					: "");
+
+			$("rows").innerHTML = plan.rows.length > 0
+				? plan.rows.map(row => `
+          <tr>
+            <td>Năm ${row.year}</td>
+            <td>${fmt(row.rate)}</td>
+            <td>${fmt(row.opening)}</td>
+            <td>${fmt(row.monthly)}</td>
+            <td>${fmt(row.rentOffset)}</td>
+            <td>${fmt(row.own)}</td>
+            <td>${fmt(row.total)}</td>
+            <td>${fmt(row.interest)}</td>
+            <td>${fmt(row.closing)}</td>
+          </tr>
+        `).join("")
+				: '<tr><td colspan="9">Không có khoản vay cần trả.</td></tr>';
+		}
+
+		function applyDefaults() {
+			for (const [id, value] of Object.entries(DEFAULTS)) {
+				$(id).value = value;
+			}
+
+			$("useRent").checked = DEFAULT_USE_RENT;
+			renderRates(DEFAULT_RATES);
+			render();
+		}
+
+		document.querySelector("main").addEventListener("input", event => {
+			if (event.target.matches('input[type="number"]')) render();
+		});
+
+		$("useRent").addEventListener("change", render);
+
+		$("addRate").addEventListener("click", () => {
+			const values = currentRates();
+			const last = values[values.length - 1];
+
+			values.push(Number.isFinite(last) ? last : DEFAULT_RATES[DEFAULT_RATES.length - 1]);
+			renderRates(values);
+			render();
+		});
+
+		$("rates").addEventListener("click", event => {
+			const button = event.target.closest("button[data-remove]");
+			if (!button) return;
+
+			const values = currentRates();
+			if (values.length <= 1) return;
+
+			values.splice(Number(button.dataset.remove), 1);
+			renderRates(values);
+			render();
+		});
+
+		$("reset").addEventListener("click", () => {
+			const accepted = window.confirm(
+				"Đặt lại toàn bộ dữ liệu về mặc định? Các giá trị bạn đã nhập sẽ bị thay thế."
+			);
+
+			if (accepted) applyDefaults();
+		});
+
+		applyDefaults();
+	</script>
+</body>
+
+</html>
